@@ -1,0 +1,14 @@
+{
+  "name": "dogger/dogger-sdk",
+  "autoload": {
+    "psr-4": {
+      "Dogger\\DoggerSdk\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Dogger"
+    }
+  ],
+  "require": {}
+}
