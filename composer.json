@@ -3,7 +3,10 @@
   "autoload": {
     "psr-4": {
       "Dogger\\DoggerSdk\\": "src/"
-    }
+    },
+    "files": [
+      "src/index.php"
+    ]
   },
   "authors": [
     {
