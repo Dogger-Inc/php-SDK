@@ -27,7 +27,7 @@ class Dogger {
     }
 
     private function listenToErrors() {
-        set_error_handler('doggerErrorHandler');
+        set_error_handler([$this, 'doggerErrorHandler']);
     }
 
     private function handleErrorStack($error) {
