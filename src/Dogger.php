@@ -69,7 +69,8 @@ class Dogger {
             curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
 
-            curl_exec($curl);
+            $res = curl_exec($curl);
+            print_r($res);
             curl_close($curl);
         } catch (Exception $e) {
             echo "DOGGER - Can't send error to dogger please check yourn configuration";
