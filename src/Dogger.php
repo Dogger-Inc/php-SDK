@@ -7,8 +7,8 @@ class Dogger {
 
     private $config;
     public function __construct($config) {
-        if (array_key_exists('key', $config) && array_key_exists('url', $config) && array_key_exists('env', $config)) {
-            echo "Please give correct config to dogger instance";
+        if (!array_key_exists('key', $config) || !array_key_exists('url', $config) || !array_key_exists('env', $config)) {
+            echo "DOGGER - Please give correct config to dogger instance. \n";
             return;
         }
 
@@ -72,7 +72,7 @@ class Dogger {
             curl_exec($curl);
             curl_close($curl);
         } catch (Exception $e) {
-            echo "Can't send error to dogger please check yourn configuration";
+            echo "DOGGER - Can't send error to dogger please check yourn configuration";
         }
     }
 }
