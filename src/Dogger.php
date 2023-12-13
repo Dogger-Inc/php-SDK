@@ -7,7 +7,7 @@ class Dogger {
 
     private $config;
     public function __construct($config) {
-        if ($config['key'] && $config['url'] && $config['env']) {
+        if (array_key_exists('key', $config) && array_key_exists('url', $config) && array_key_exists('env', $config)) {
             echo "Please give correct config to dogger instance";
             return;
         }
