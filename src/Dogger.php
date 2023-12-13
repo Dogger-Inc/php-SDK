@@ -12,6 +12,8 @@ class Dogger {
             return;
         }
 
+        error_reporting(E_ALL);
+
         $this->config = $config;
         $this->listenToErrors();
     }
@@ -20,25 +22,44 @@ class Dogger {
         $this->handleErrorStack($error);
     }
 
-    private function doggerErrorHandler($errno, $errstr, $errfile, $errline) {
+    function doggerErrorHandler($errno, $errstr, $errfile, $errline) {
+        $trace = json_encode(debug_backtrace());
         $error = [
             'type' => $errno,
             'message' => $errstr,
             'file' => $errfile,
             'line' => $errline,
-            'trace' => debug_backtrace(),
+            'trace' => "$trace",
         ];
 
         $this->handleErrorStack($error);
+        return true;
+    }
+
+    function doggerFatalErrorHandler() {
+        $lastError = error_get_last();
+        $line = $lastError['line'];
+        $file = $lastError['file'];
+
+        $error = [
+            'type' => $lastError['type'],
+            'message' => $lastError['message'],
+            'file' => $file,
+            'line' => $line,
+            'trace' => "$file $line",
+        ];
+
+        $this->handleErrorStack($error);
+        return true;
     }
 
     private function listenToErrors() {
+        register_shutdown_function([$this, 'doggerFatalErrorHandler']);
         set_error_handler([$this, 'doggerErrorHandler']);
     }
 
     private function handleErrorStack($error) {
         $this->send($error);
-
     }
 
     private function send($error) {
@@ -47,31 +68,29 @@ class Dogger {
             $dogger_env = $this->config['env'];
             $dogger_url = $this->config['url'];
 
-            $payload = <<<DATA
-            {
-                http_code: 400,
-                message: $error->message,
-                stacktrace: $error->trace,
-                type: error,
-                env: $dogger_env
-            }
-            DATA;
+            $payload = [
+                'http_code' => 400,
+                'message' => $error['message'],
+                'stacktrace' => $error['trace'],
+                'type' => 'error',
+                'env' => $dogger_env
+            ];
 
-            $headers = array(
-                "Content-Type: application/json",
+            $jsonPayload = json_encode($payload);
+
+            $ch = curl_init("$dogger_url/api/issues/new");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonPayload);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Content-Type: application/json',
+                'Accept: application/json',
                 "Authorization: Bearer $dogger_key"
-            );
+            ));
 
-            $curl = curl_init();
-
-            curl_setopt($curl, CURLOPT_URL, "$dogger_url/api/issues/new");
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
-
-            curl_exec($curl);
-            curl_close($curl);
+            curl_exec($ch);
+            curl_close($ch);
         } catch (Exception $e) {
             echo "DOGGER - Can't send error to dogger please check yourn configuration";
         }
