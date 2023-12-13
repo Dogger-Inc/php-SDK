@@ -7,7 +7,7 @@ class Dogger {
 
     private $config;
     public function __construct($config) {
-        if ($config->key && $config->url && $config->env) {
+        if ($config['key'] && $config['url'] && $config['env']) {
             echo "Please give correct config to dogger instance";
             return;
         }
@@ -43,8 +43,8 @@ class Dogger {
 
     private function send($error) {
         try {
-            $dogger_key = $this->config->key;
-            $dogger_env = $this->config->env;
+            $dogger_key = $this->config['key'];
+            $dogger_env = $this->config['env'];
 
             $payload = <<<DATA
             {
@@ -63,7 +63,7 @@ class Dogger {
 
             $curl = curl_init();
 
-            curl_setopt($curl, CURLOPT_URL, $this->config->url);
+            curl_setopt($curl, CURLOPT_URL, $this->config['url']);
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
