@@ -45,6 +45,7 @@ class Dogger {
         try {
             $dogger_key = $this->config['key'];
             $dogger_env = $this->config['env'];
+            $dogger_url = $this->config['url'];
 
             $payload = <<<DATA
             {
@@ -63,14 +64,13 @@ class Dogger {
 
             $curl = curl_init();
 
-            curl_setopt($curl, CURLOPT_URL, $this->config['url']);
+            curl_setopt($curl, CURLOPT_URL, "$dogger_url/api/issues/new");
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
 
-            $res = curl_exec($curl);
-            print_r($res);
+            curl_exec($curl);
             curl_close($curl);
         } catch (Exception $e) {
             echo "DOGGER - Can't send error to dogger please check yourn configuration";
