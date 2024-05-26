@@ -116,7 +116,7 @@ class Dogger {
         $this->performances[] = $entry;
     }
 
-    private function stopTimer($id, $threshold) {
+    private function stopTimer($id, $threshold = 0) {
         $index = array_search($id, array_column($this->performances, 'id'));
 
         if ($index !== false) {
