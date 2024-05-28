@@ -4,7 +4,7 @@ namespace Dogger\DoggerSdk;
 
 function init($config) {
     $defaultConfig = [
-        'url' => 'http://127.0.0.1:8000',
+        'url' => 'https://dogger.cloud',
     ];
     return new Dogger(array_merge($defaultConfig, $config));
 }
